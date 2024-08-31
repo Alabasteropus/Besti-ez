@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChakraProvider, Box, VStack, Grid, theme } from "@chakra-ui/react";
+import { Box, VStack, Grid, useColorModeValue } from "@chakra-ui/react";
 import Header from './components/Header';
 import ProfileList from './components/ProfileList';
 import ProfileDetail from './components/ProfileDetail';
@@ -40,30 +40,31 @@ function App() {
     setIsModalOpen(false);
   };
 
+  const bg = useColorModeValue("gray.800", "gray.900");
+  const color = useColorModeValue("gray.100", "gray.50");
+
   return (
-    <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl">
-        <Grid minH="100vh" p={3}>
-          <VStack spacing={8}>
-            <Header />
-            <Grid templateColumns="repeat(3, 1fr)" gap={6} width="100%">
-              <ProfileList
-                profiles={profiles}
-                onSelectProfile={handleProfileSelect}
-                onCreateProfile={handleCreateProfile}
-                onUpdateProfile={handleUpdateProfile}
-                handleOpenModal={handleOpenModal}
-              />
-              <ProfileDetail profile={selectedProfile} handleOpenModal={handleOpenModal} />
-              <VStack spacing={4}>
-                <RemindersSection selectedProfile={selectedProfile} />
-                <SuggestionsSection selectedProfile={selectedProfile} />
-              </VStack>
-            </Grid>
-          </VStack>
-        </Grid>
-      </Box>
-    </ChakraProvider>
+    <Box textAlign="center" fontSize="xl" bg={bg} color={color}>
+      <Grid minH="100vh" p={3}>
+        <VStack spacing={8}>
+          <Header />
+          <Grid templateColumns="repeat(3, 1fr)" gap={6} width="100%">
+            <ProfileList
+              profiles={profiles}
+              onSelectProfile={handleProfileSelect}
+              onCreateProfile={handleCreateProfile}
+              onUpdateProfile={handleUpdateProfile}
+              handleOpenModal={handleOpenModal}
+            />
+            <ProfileDetail profile={selectedProfile} handleOpenModal={handleOpenModal} />
+            <VStack spacing={4}>
+              <RemindersSection selectedProfile={selectedProfile} />
+              <SuggestionsSection selectedProfile={selectedProfile} />
+            </VStack>
+          </Grid>
+        </VStack>
+      </Grid>
+    </Box>
   );
 }
 
