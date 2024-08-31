@@ -41,10 +41,10 @@ const SuggestionsSection = ({ selectedProfile }) => {
           setSuggestions(data.suggestion);
         } else if (data.error) {
           console.error('Error from WebSocket:', data.error);
-          showErrorToast(data.error);
+          showErrorToast('Failed to process the suggestion. Please try again.');
         } else {
           console.warn('Unexpected WebSocket response:', data);
-          showErrorToast('Received an unexpected response. Please try again.');
+          showErrorToast('Failed to process the suggestion. Please try again.');
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -85,6 +85,8 @@ const SuggestionsSection = ({ selectedProfile }) => {
               colorScheme="blue"
               isLoading={isLoading}
               isDisabled={readyState !== ReadyState.OPEN}
+              data-loading={isLoading}
+              data-testid="get-suggestion-button"
             >
               Get New Suggestion
             </Button>

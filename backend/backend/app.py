@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.types import JSON
@@ -12,6 +12,7 @@ import json
 from datetime import datetime, timedelta
 import logging
 from dotenv import load_dotenv
+import asyncio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -255,3 +256,42 @@ async def query_gpt4o(profile_id: int, query_request: QueryRequest, db: Session 
     logging.info("Received response from GPT-4o API")
 
     return {"response": response}
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            logging.info(f"Received message: {data}")
+            message = json.loads(data)
+
+            if message['action'] == 'query_gpt4o':
+                db = next(get_db())
+                profile_id = message['profile_id']
+                query = message['query']
+
+                db_profile = db.query(ProfileDB).filter(ProfileDB.id == profile_id).first()
+                if not db_profile:
+                    response = {"error": "Profile not found"}
+                else:
+                    gpt4o_response = query_gpt4o_api(db_profile, query)
+                    response = {
+                        "action": "suggestion_response",
+                        "suggestion": gpt4o_response
+                    }
+            else:
+                response = {"error": "Unknown action"}
+
+            await websocket.send_text(json.dumps(response))
+            logging.info(f"Sent response: {response}")
+    except WebSocketDisconnect:
+        logging.info("WebSocket disconnected")
+    except json.JSONDecodeError:
+        logging.error("Invalid JSON received")
+        await websocket.send_text(json.dumps({"error": "Invalid JSON"}))
+    except Exception as e:
+        logging.error(f"WebSocket error: {str(e)}")
+        await websocket.send_text(json.dumps({"error": str(e)}))
+    finally:
+        logging.info("WebSocket connection closed")
