@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, VStack, Heading, List, ListItem, Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, Image, useDisclosure, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Heading, List, ListItem, Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, Image, useColorModeValue } from "@chakra-ui/react";
 
 const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfile, handleOpenModal }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

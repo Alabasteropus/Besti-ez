@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, VStack, Grid, useColorModeValue } from "@chakra-ui/react";
+import useWebSocket from 'react-use-websocket';
 import Header from './components/Header';
 import ProfileList from './components/ProfileList';
 import ProfileDetail from './components/ProfileDetail';
@@ -16,7 +17,8 @@ const initialProfiles = [
 function App() {
   const [profiles, setProfiles] = useState(initialProfiles);
   const [selectedProfile, setSelectedProfile] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState('');
+  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8000/ws');
 
   const handleProfileSelect = (profileId) => {
     const profile = profiles.find(p => p.id === profileId);
@@ -33,15 +35,19 @@ function App() {
 
   const handleOpenModal = (profile = null) => {
     setSelectedProfile(profile);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
   };
 
   const bg = useColorModeValue("gray.800", "gray.900");
   const color = useColorModeValue("gray.100", "gray.50");
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const messageData = JSON.parse(lastMessage.data);
+      // Handle the incoming WebSocket message
+      // For example, update suggestions or handle real-time updates
+      console.log('Received WebSocket message:', messageData);
+    }
+  }, [lastMessage]);
 
   return (
     <Box textAlign="center" fontSize="xl" bg={bg} color={color}>
@@ -59,7 +65,7 @@ function App() {
             <ProfileDetail profile={selectedProfile} handleOpenModal={handleOpenModal} />
             <VStack spacing={4}>
               <RemindersSection selectedProfile={selectedProfile} />
-              <SuggestionsSection selectedProfile={selectedProfile} />
+              <SuggestionsSection selectedProfile={selectedProfile} sendMessage={sendMessage} />
             </VStack>
           </Grid>
         </VStack>
