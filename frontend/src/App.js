@@ -16,6 +16,7 @@ const initialProfiles = [
 function App() {
   const [profiles, setProfiles] = useState(initialProfiles);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleProfileSelect = (profileId) => {
     const profile = profiles.find(p => p.id === profileId);
@@ -30,6 +31,15 @@ function App() {
     setProfiles(profiles.map(profile => profile.id === updatedProfile.id ? updatedProfile : profile));
   };
 
+  const handleOpenModal = (profile = null) => {
+    setSelectedProfile(profile);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
@@ -42,8 +52,9 @@ function App() {
                 onSelectProfile={handleProfileSelect}
                 onCreateProfile={handleCreateProfile}
                 onUpdateProfile={handleUpdateProfile}
+                handleOpenModal={handleOpenModal}
               />
-              <ProfileDetail profile={selectedProfile} />
+              <ProfileDetail profile={selectedProfile} handleOpenModal={handleOpenModal} />
               <VStack spacing={4}>
                 <RemindersSection selectedProfile={selectedProfile} />
                 <SuggestionsSection selectedProfile={selectedProfile} />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, VStack, Heading, List, ListItem, Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, Image, useDisclosure } from "@chakra-ui/react";
 
-const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfile }) => {
+const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfile, handleOpenModal }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProfile, setCurrentProfile] = useState({ name: '', relationship: '', birthday: '', likes: '', dislikes: '', favoriteFood: '', favoriteMovie: '', hobbies: '', imageUrl: 'default-profile-pic.png' });
@@ -14,7 +14,7 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
     return acc;
   }, {});
 
-  const handleOpenModal = (profile = null) => {
+  const handleLocalOpenModal = (profile = null) => {
     if (profile) {
       setCurrentProfile(profile);
       setIsEditing(true);
@@ -42,7 +42,7 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
   return (
     <Box borderWidth={1} borderRadius="lg" p={4} boxShadow="md" bg="white">
       <Heading size="md" mb={4}>Profiles</Heading>
-      <Button colorScheme="blue" onClick={() => handleOpenModal()}>Add New Profile</Button>
+      <Button colorScheme="blue" onClick={() => handleLocalOpenModal()}>Add New Profile</Button>
       <VStack align="stretch" spacing={4} mt={4}>
         {Object.entries(groupedProfiles).map(([relationship, profiles]) => (
           <Box key={relationship}>
