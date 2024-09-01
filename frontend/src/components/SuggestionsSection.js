@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Box, VStack, Heading, Text, Button, useToast } from "@chakra-ui/react";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import config from '../config';
 
 const SuggestionsSection = ({ selectedProfile }) => {
   const [suggestions, setSuggestions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8000/ws');
+  const wsUrl = `${config.API_BASE_URL.replace('http', 'ws')}/ws`;
+  const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl);
 
   useEffect(() => {
-    if (selectedProfile) {
+    if (selectedProfile && selectedProfile.id) {
       fetchSuggestions();
     }
   }, [selectedProfile]);
 
   const fetchSuggestions = () => {
-    if (!selectedProfile) return;
+    if (!selectedProfile || !selectedProfile.id) return;
 
     setIsLoading(true);
     setSuggestions(''); // Clear previous suggestions

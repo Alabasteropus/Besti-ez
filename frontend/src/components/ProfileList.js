@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, VStack, Heading, List, ListItem, Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, Image, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Heading, List, ListItem, Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, Image, useColorModeValue, HStack } from "@chakra-ui/react";
 
 const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfile, handleOpenModal }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentProfile, setCurrentProfile] = useState({ name: '', relationship: '', birthday: '', likes: '', dislikes: '', favoriteFood: '', favoriteMovie: '', hobbies: '', imageUrl: 'default-profile-pic.png' });
+  const [currentProfile, setCurrentProfile] = useState({ name: '', relationship: '', birthday: '', likes: '', dislikes: '', favoriteFood: '', favoriteMovie: '', hobbies: '', imageUrl: 'default-profile-pic.png', random_knowledge: '' });
 
   // Move useColorModeValue calls to the top level of the component
   const bgColor = useColorModeValue("white", "gray.700");
@@ -33,7 +33,7 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
       setCurrentProfile(profile);
       setIsEditing(true);
     } else {
-      setCurrentProfile({ name: '', relationship: '', birthday: '', likes: '', dislikes: '', favoriteFood: '', favoriteMovie: '', hobbies: '', imageUrl: '' });
+      setCurrentProfile({ name: '', relationship: '', birthday: '', likes: '', dislikes: '', favoriteFood: '', favoriteMovie: '', hobbies: '', imageUrl: '', random_knowledge: '' });
       setIsEditing(false);
     }
     setIsModalOpen(true);
@@ -72,15 +72,16 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
                   onClick={() => onSelectProfile(profile.id)}
                   bg={listItemBgColor}
                 >
-                  <VStack spacing={1} align="center">
+                  <HStack spacing={2} align="center">
                     <Image
-                      boxSize="50px"
-                      borderRadius="full"
+                      boxSize="24px"
+                      borderRadius="sm"
+                      objectFit="cover"
                       src={profile.imageUrl || 'default-profile-pic.png'}
                       alt={`${profile.name}'s thumbnail`}
                     />
                     <Text color={nameColor}>{profile.name}</Text>
-                  </VStack>
+                  </HStack>
                 </ListItem>
               ))}
             </List>
@@ -108,11 +109,11 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
             </FormControl>
             <FormControl mt={4}>
               <FormLabel color={formLabelColor}>Likes</FormLabel>
-              <Input value={currentProfile.likes} onChange={(e) => setCurrentProfile({ ...currentProfile, likes: e.target.value })} bg={inputBgColor} color={inputTextColor} />
+              <Input value={currentProfile.likes} onChange={(e) => setCurrentProfile({ ...currentProfile, likes: e.target.value.split(',') })} bg={inputBgColor} color={inputTextColor} />
             </FormControl>
             <FormControl mt={4}>
               <FormLabel color={formLabelColor}>Dislikes</FormLabel>
-              <Input value={currentProfile.dislikes} onChange={(e) => setCurrentProfile({ ...currentProfile, dislikes: e.target.value })} bg={inputBgColor} color={inputTextColor} />
+              <Input value={currentProfile.dislikes} onChange={(e) => setCurrentProfile({ ...currentProfile, dislikes: e.target.value.split(',') })} bg={inputBgColor} color={inputTextColor} />
             </FormControl>
             <FormControl mt={4}>
               <FormLabel color={formLabelColor}>Favorite Food</FormLabel>
@@ -124,7 +125,11 @@ const ProfileList = ({ profiles, onSelectProfile, onCreateProfile, onUpdateProfi
             </FormControl>
             <FormControl mt={4}>
               <FormLabel color={formLabelColor}>Hobbies</FormLabel>
-              <Input value={currentProfile.hobbies} onChange={(e) => setCurrentProfile({ ...currentProfile, hobbies: e.target.value })} bg={inputBgColor} color={inputTextColor} />
+              <Input value={currentProfile.hobbies} onChange={(e) => setCurrentProfile({ ...currentProfile, hobbies: e.target.value.split(',') })} bg={inputBgColor} color={inputTextColor} />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel color={formLabelColor}>Random Knowledge</FormLabel>
+              <Input value={currentProfile.randomKnowledge} onChange={(e) => setCurrentProfile({ ...currentProfile, randomKnowledge: e.target.value })} bg={inputBgColor} color={inputTextColor} />
             </FormControl>
             <FormControl mt={4}>
               <FormLabel color={formLabelColor}>Profile Picture</FormLabel>
