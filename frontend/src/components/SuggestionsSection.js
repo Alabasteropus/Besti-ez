@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Box, VStack, Heading, Text, Button, useToast } from "@chakra-ui/react";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import config from '../config';
 
 const SuggestionsSection = ({ selectedProfile }) => {
   const [suggestions, setSuggestions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8000/ws');
+  const wsUrl = `${config.API_BASE_URL.replace('http', 'ws')}/ws`;
+  const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl);
 
   useEffect(() => {
-    if (selectedProfile) {
+    if (selectedProfile && selectedProfile.id) {
       fetchSuggestions();
     }
   }, [selectedProfile]);
 
   const fetchSuggestions = () => {
-    if (!selectedProfile) return;
+    if (!selectedProfile || !selectedProfile.id) return;
 
     setIsLoading(true);
     setSuggestions(''); // Clear previous suggestions
@@ -41,10 +43,10 @@ const SuggestionsSection = ({ selectedProfile }) => {
           setSuggestions(data.suggestion);
         } else if (data.error) {
           console.error('Error from WebSocket:', data.error);
-          showErrorToast(data.error);
+          showErrorToast('Failed to process the suggestion. Please try again.');
         } else {
           console.warn('Unexpected WebSocket response:', data);
-          showErrorToast('Received an unexpected response. Please try again.');
+          showErrorToast('Failed to process the suggestion. Please try again.');
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -85,6 +87,8 @@ const SuggestionsSection = ({ selectedProfile }) => {
               colorScheme="blue"
               isLoading={isLoading}
               isDisabled={readyState !== ReadyState.OPEN}
+              data-loading={isLoading}
+              data-testid="get-suggestion-button"
             >
               Get New Suggestion
             </Button>

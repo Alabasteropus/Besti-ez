@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, Grid, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Grid, useColorModeValue, useToast } from "@chakra-ui/react";
 import useWebSocket from 'react-use-websocket';
 import Header from './components/Header';
 import ProfileList from './components/ProfileList';
@@ -18,7 +18,11 @@ function App() {
   const [profiles, setProfiles] = useState(initialProfiles);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [suggestions, setSuggestions] = useState('');
-  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8000/ws');
+  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8000/ws', {
+    shouldReconnect: (closeEvent) => true,
+    reconnectInterval: 3000,
+  });
+  const toast = useToast();
 
   const handleProfileSelect = (profileId) => {
     const profile = profiles.find(p => p.id === profileId);
@@ -31,6 +35,19 @@ function App() {
 
   const handleUpdateProfile = (updatedProfile) => {
     setProfiles(profiles.map(profile => profile.id === updatedProfile.id ? updatedProfile : profile));
+    setSelectedProfile(updatedProfile);
+  };
+
+  const handleDeleteProfile = (profileId) => {
+    setProfiles(profiles.filter(profile => profile.id !== profileId));
+    setSelectedProfile(null);
+    toast({
+      title: "Profile deleted",
+      description: "The profile has been successfully removed.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const handleOpenModal = (profile = null) => {
@@ -43,11 +60,18 @@ function App() {
   useEffect(() => {
     if (lastMessage !== null) {
       const messageData = JSON.parse(lastMessage.data);
-      // Handle the incoming WebSocket message
-      // For example, update suggestions or handle real-time updates
-      console.log('Received WebSocket message:', messageData);
+      if (messageData.action === 'suggestion_response') {
+        setSuggestions(messageData.suggestion);
+        toast({
+          title: "New suggestion received",
+          description: "A new suggestion has been generated for the selected profile.",
+          status: "info",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
-  }, [lastMessage]);
+  }, [lastMessage, toast]);
 
   return (
     <Box textAlign="center" fontSize="xl" bg={bg} color={color}>
@@ -62,10 +86,21 @@ function App() {
               onUpdateProfile={handleUpdateProfile}
               handleOpenModal={handleOpenModal}
             />
-            <ProfileDetail profile={selectedProfile} handleOpenModal={handleOpenModal} />
+            <ProfileDetail
+              profile={selectedProfile}
+              handleOpenModal={handleOpenModal}
+              onDeleteProfile={handleDeleteProfile}
+              onUpdateProfile={handleUpdateProfile}
+              sendMessage={sendMessage}
+              lastMessage={lastMessage}
+            />
             <VStack spacing={4}>
               <RemindersSection selectedProfile={selectedProfile} />
-              <SuggestionsSection selectedProfile={selectedProfile} sendMessage={sendMessage} />
+              <SuggestionsSection
+                selectedProfile={selectedProfile}
+                sendMessage={sendMessage}
+                suggestions={suggestions}
+              />
             </VStack>
           </Grid>
         </VStack>

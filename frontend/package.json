@@ -9,6 +9,9 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.6",
+    "jest": "^27.5.1",
+    "jest-environment-jsdom": "^27.5.1",
+    "mock-socket": "^9.1.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
@@ -19,6 +22,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:unit": "react-scripts test --testPathPattern=src/__tests__/unit",
+    "test:integration": "react-scripts test --testPathPattern=src/__tests__/integration",
+    "test:e2e": "react-scripts test --testPathPattern=src/__tests__/e2e",
+    "test:coverage": "react-scripts test --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -38,5 +45,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jest-websocket-mock": "^2.5.0"
   }
 }
